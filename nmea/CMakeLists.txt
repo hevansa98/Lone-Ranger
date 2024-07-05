@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.25.0)
 
-project(coordinate)
+project(nmea)
 
 include_directories(include)
 
-add_library(coordinate
+add_library(nmea
             SHARED
-            src/transforms.earth.cpp
+            src/nmea.parse.cpp
 )
