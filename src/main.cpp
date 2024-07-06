@@ -5,8 +5,6 @@
 #include <sstream>
 
 #include <nmea.parse.hpp>
-#include <nmea.format.gga.hpp>
-#include <nmea.format.rmc.hpp>
 
 #include <transforms.earth.hpp>
 #include <transforms.distance.hpp>
@@ -57,16 +55,20 @@ int main(void)
 
     int count = 0;
 
+    unique_ptr<nmea::nmea_parse> Parser;
+
     while(getline(GPS_Stream, Current_Line))
     {
         if(Current_Line[0] == '$')
         {
             Read_Buffer.at(count) = Current_Line;
             //cout << "Size: " << Read_Buffer.size() << " Count: " << count << " " << Read_Buffer.at(count) << endl;
-            if(Current_Line.substr(3, 3) == "GGA")
-            nmea::nmea_format_gga ohboy(Current_Line);
-            if(Current_Line.substr(3, 3) == "RMC")
-            nmea::nmea_format_rmc ohboy(Current_Line);
+            Parser = make_unique<nmea::nmea_parse>(Current_Line);
+            //if(Current_Line.substr(3, 3) == "GGA")
+            //nmea::nmea_format_gga ohboy(Current_Line);
+            //if(Current_Line.substr(3, 3) == "RMC")
+            //nmea::nmea_format_rmc ohboy(Current_Line);
+
             if(count == Buffer_Size-1)
             {
                 count = 0;

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <nmea.format.hpp>
+#include <nmea.format.gga.hpp>
+#include <nmea.format.rmc.hpp>
 
 #include <string>
 

@@ -72,10 +72,22 @@ namespace nmea
                     Checksum = 0;
                 }
             } Current_Fields_Struct;
+        
+            Current_Fields_Struct Current_Fields;
+
+            double   Get_Latitude (void){ return Current_Fields.Latitude; };
+            double   Get_Longitude(void){ return Current_Fields.Longitude; };
+            uint64_t Get_UTC      (void){ return Current_Fields.UTC; };
 
             std::string RAW_String;
+
+            /* Processes and parses the NMEA data */
             virtual void Process_Fields() = 0;
 
+            /* Checks the NMEA string and calculates the checksum to evaluate against */
+            /* @param Whole_Message NMEA message unaltered */
+            /* @param Output_Checksum Calculated checksum */
+            /* @return Whether calculated checksum matches message checksum */
             bool Is_Checksum_Valid(const std::string& Whole_Message, int & Output_Checksum) 
             {
                 bool Valid_Checksum = false;
@@ -102,6 +114,9 @@ namespace nmea
                 return Valid_Checksum;
             }
 
+            /* Converts NMEA LLA format to Decimal format */
+            /* @param RAW NMEA LLA format DDMM.MMMM */
+            /* @param Decimal Degrees in decimal format DD.DDDD */
             void Convert_RAW_LLA_To_Decimal(const double & RAW, double & Decimal){
 
                 double DD, SS; /* Decimal Degrees, Decimal Seconds */
@@ -114,6 +129,9 @@ namespace nmea
 
             }
 
+            /* Parses the UTC value from the NMEA string */
+            /* @param RAW_UTC NMEA UTC unaltered */
+            /* @param Output_UTC Parsed UTC value */
             void Convert_UTC(const std::string & RAW_UTC, uint64_t & Output_UTC)
             {
                 Output_UTC = stoul(RAW_UTC);

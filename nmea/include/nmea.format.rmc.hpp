@@ -24,18 +24,14 @@ namespace nmea
             TRACK_ANGLE_IN_DEGREES_TRUE,
             DATE,
             MAGNETIC_VARIATION_DEGREES,
+            MAGNETIC_VARIATION_DIRECTION,
             CHECKSUM,
             NUM_OF_FIELDS
         };
         std::string Currently_Processed_Message_Dbg[(size_t)FIELDS::NUM_OF_FIELDS];
-        
-        Current_Fields_Struct Current_Fields;
 
         void Process_Fields() final;
-
-        double   Get_Latitude (void){ return Current_Fields.Latitude; };
-        double   Get_Longitude(void){ return Current_Fields.Longitude; };
-        uint64_t Get_UTC      (void){ return Current_Fields.UTC; };
+        
     public:
         nmea_format_rmc(std::string);
         ~nmea_format_rmc();
@@ -45,7 +41,7 @@ namespace nmea
     {
         FIELDS Currently_Processed_Field = FIELDS::MESSAGE_ID;
 
-        this->RAW_String = RAW_Input;
+        RAW_String = RAW_Input;
 
         for(std::string::iterator Current_Character = RAW_Input.begin(); Current_Character != RAW_Input.end(); Current_Character++)
         {
@@ -57,9 +53,7 @@ namespace nmea
 
             if(*Current_Character == ',')
             {
-                //std::cout << "Size: " << Currently_Processed_Message_Dbg[(size_t)Currently_Processed_Field].length() << " " << Currently_Processed_Message_Dbg[(size_t)Currently_Processed_Field] << "\n";
-
-                Currently_Processed_Field = (FIELDS)((size_t)Currently_Processed_Field + 1);
+                Currently_Processed_Field = (FIELDS)((size_t)Currently_Processed_Field + 1);                
             }
         }
 
