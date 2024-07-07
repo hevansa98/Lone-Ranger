@@ -51,6 +51,15 @@ namespace nmea
         "VTG"
     };
 
+    typedef struct _Satellite_Data_Type
+    {
+        uint64_t ID, Elevation, Azimuth, SNR;
+        _Satellite_Data_Type()
+        {
+            ID = Elevation = Azimuth = SNR = 0;
+        };
+    }Satellite_Data_Type;
+
     class nmea_format
     {
         public:
@@ -64,7 +73,7 @@ namespace nmea
                 uint64_t UTC;
                 double Latitude;
                 double Longitude;
-                int Checksum;
+                uint64_t Checksum;
                 _Current_Fields_Struct()
                 {
                     UTC = 0;
@@ -88,22 +97,20 @@ namespace nmea
             /* @param Whole_Message NMEA message unaltered */
             /* @param Output_Checksum Calculated checksum */
             /* @return Whether calculated checksum matches message checksum */
-            bool Is_Checksum_Valid(const std::string& Whole_Message, int & Output_Checksum) 
+            bool Is_Checksum_Valid(const std::string& Whole_Message, uint64_t & Output_Checksum) 
             {
                 bool Valid_Checksum = false;
 
                 /* Remove the starting $ and the incoming checksum */
                 std::string Removed_Prefix_Delimiters = RAW_String.substr(1, RAW_String.length()-4);
                 /* Isolate the incoming checksum to compare against */
-                std::string RAW_Checksum = RAW_String.substr(RAW_String.length()-2, RAW_String.length());
+                std::string RAW_Checksum = RAW_String.substr(RAW_String.length()-2, 2);
 
                 Output_Checksum = 0;
 
+                /* Despite some sources indicating commas need be ignored, keep the commas in the calculation */
                 for (char ch : Removed_Prefix_Delimiters) {
-                    if(ch != ',')
-                    {
-                        Output_Checksum ^= ch; // XOR operation with each character
-                    }
+                    Output_Checksum ^= ch; // XOR operation with each character
                 }
 
                 if(stoi(RAW_Checksum, 0, 16) == Output_Checksum)

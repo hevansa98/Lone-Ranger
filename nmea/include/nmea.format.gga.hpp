@@ -48,15 +48,14 @@ namespace nmea
 
         for(std::string::iterator Current_Character = RAW_Input.begin(); Current_Character != RAW_Input.end(); Current_Character++)
         {
-
-            if((*Current_Character != ',') && (*Current_Character != '\n'))
+            if((*Current_Character == ',') || (*Current_Character == '*'))
             {
-                Currently_Processed_Message_Dbg[(size_t)Currently_Processed_Field] += *Current_Character;
+                Currently_Processed_Field = (FIELDS)((size_t)Currently_Processed_Field + 1);      
             }
 
-            if(*Current_Character == ',')
+            if((*Current_Character != ',') && (*Current_Character != '*'))
             {
-                Currently_Processed_Field = (FIELDS)((size_t)Currently_Processed_Field + 1);
+                Currently_Processed_Message_Dbg[(size_t)Currently_Processed_Field] += *Current_Character;
             }
         }
 

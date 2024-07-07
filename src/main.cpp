@@ -57,26 +57,30 @@ int main(void)
 
     unique_ptr<nmea::nmea_parse> Parser;
 
+    std::vector<nmea::Satellite_Data_Type> Satellite_Table;
+
     while(getline(GPS_Stream, Current_Line))
     {
-        if(Current_Line[0] == '$')
-        {
-            Read_Buffer.at(count) = Current_Line;
-            //cout << "Size: " << Read_Buffer.size() << " Count: " << count << " " << Read_Buffer.at(count) << endl;
-            Parser = make_unique<nmea::nmea_parse>(Current_Line);
-            //if(Current_Line.substr(3, 3) == "GGA")
-            //nmea::nmea_format_gga ohboy(Current_Line);
-            //if(Current_Line.substr(3, 3) == "RMC")
-            //nmea::nmea_format_rmc ohboy(Current_Line);
+        Read_Buffer.at(count) = Current_Line;
+        //cout << "Size: " << Read_Buffer.size() << " Count: " << count << " " << Read_Buffer.at(count) << endl;
+        Parser = make_unique<nmea::nmea_parse>(Read_Buffer.at(count), Satellite_Table);
 
-            if(count == Buffer_Size-1)
+        if(Satellite_Table.size() == Satellite_Table.capacity())
+        {
+            for(const nmea::Satellite_Data_Type Sat : Satellite_Table)
             {
-                count = 0;
+                std::cout << "ID: " << Sat.ID << " Azimuth: " << Sat.Azimuth << " Elevation: " << Sat.Elevation << " SNR: " << Sat.SNR << std::endl;
             }
-            else
-            {
-                count++;
-            }
+            Satellite_Table.clear();
+        }
+
+        if(count == Buffer_Size-1)
+        {
+            count = 0;
+        }
+        else
+        {
+            count++;
         }
     }
 
