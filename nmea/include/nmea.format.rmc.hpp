@@ -116,7 +116,7 @@ namespace nmea
             }
         }
 
-        std::cout << std::setprecision(10) << "Lat/Long Dec: " << Current_Fields.Latitude << ", " << Current_Fields.Longitude << std::endl;
+        //std::cout << std::setprecision(10) << "Lat/Long Dec: " << Current_Fields.Latitude << ", " << Current_Fields.Longitude << std::endl;
     }
     
 }

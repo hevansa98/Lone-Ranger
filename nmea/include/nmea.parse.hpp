@@ -1,5 +1,8 @@
 #pragma once
 
+#include <mutex>
+#include <semaphore>
+
 #include <nmea.format.gga.hpp>
 #include <nmea.format.rmc.hpp>
 #include <nmea.format.gsv.hpp>
@@ -12,10 +15,13 @@ namespace nmea
     class nmea_parse
     {
     private:
-        /* data */
+        std::unique_ptr<nmea_format_gsv> GSV_Parser;
     public:
-        nmea_parse(std::string, std::vector<Satellite_Data_Type> &);
+        nmea_parse();
         ~nmea_parse();
+
+        void Parse(const std::string &);
+        void Assign_Satellite_Table_Mutex(std::vector<Satellite_Data_Type> *, std::shared_ptr<std::binary_semaphore> = nullptr);
     };
 
 }
