@@ -54,6 +54,7 @@ namespace nmea
         nmea_format_gsv();
         ~nmea_format_gsv();
 
+        void Interpret_Message();
         void Parse(const std::string &);
 
         void Assign_Satellite_Table_Mutex(std::vector<Satellite_Data_Type> *, std::shared_ptr<std::binary_semaphore> = nullptr);
@@ -69,7 +70,6 @@ namespace nmea
 
     void nmea_format_gsv::Parse(const std::string & RAW_Input)
     {
-        FIELDS Currently_Processed_Field = FIELDS::MESSAGE_ID;
         
         RAW_String = RAW_Input;
 
@@ -77,6 +77,29 @@ namespace nmea
         {
             Satellite_Table_Semaphore->acquire();
         }
+
+        if(Satellite_Table != nullptr)
+        {
+
+            Interpret_Message();
+
+            /* Validate the checksum first so we do not waste time on bad data */
+            if(Is_Checksum_Valid(RAW_String, Current_Fields.Checksum))
+            {
+                Process_Fields();
+            }
+            
+        }
+
+        if(Satellite_Table_Semaphore != nullptr)
+        {
+            Satellite_Table_Semaphore->release();
+        }
+    }
+
+    void nmea_format_gsv::Interpret_Message()
+    {
+        FIELDS Currently_Processed_Field = FIELDS::MESSAGE_ID;
 
         for(size_t Field = (size_t)FIELDS::MESSAGE_ID; Field < (size_t)FIELDS::NUM_OF_FIELDS; Field++)
         {
@@ -123,17 +146,6 @@ namespace nmea
             {
                 Currently_Processed_Message_Dbg[(size_t)Currently_Processed_Field] += *Current_Character;
             }
-        }
-
-        /* Validate the checksum first so we do not waste time on bad data */
-        if(Is_Checksum_Valid(RAW_String, Current_Fields.Checksum))
-        {
-            Process_Fields();
-        }
-
-        if(Satellite_Table_Semaphore != nullptr)
-        {
-            Satellite_Table_Semaphore->release();
         }
     }
 

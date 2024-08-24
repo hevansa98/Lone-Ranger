@@ -70,12 +70,15 @@ namespace nmea
 
     void nmea_format_rmc::Process_Fields()
     {
+        if (Currently_Processed_Message_Dbg[(size_t)FIELDS::STATUS].compare("A") != 0)
+        {
+            std::cout << "Bad fix" << std::endl;
+            return;
+        }
         for(size_t Field = (size_t)FIELDS::MESSAGE_ID; Field < (size_t)FIELDS::NUM_OF_FIELDS; Field++)
         {
             switch ((FIELDS)Field)
             {
-                case FIELDS::MESSAGE_ID:
-                    break;
                 case FIELDS::UTC_POS_FIX:
 
                     Convert_UTC(Currently_Processed_Message_Dbg[(size_t)FIELDS::UTC_POS_FIX], Current_Fields.UTC);
@@ -109,8 +112,6 @@ namespace nmea
                     }
                     break;
 
-                case FIELDS::CHECKSUM:
-                    break;
                 default:
                     break;
             }

@@ -128,9 +128,9 @@ namespace nmea
 
                 double DD, SS; /* Decimal Degrees, Decimal Seconds */
 
-                DD  = int(double(RAW)/100.0);
+                DD  = int(RAW/100.0);
 
-                SS  = double(RAW) - DD * 100.0;
+                SS  = RAW - DD * 100.0;
 
                 Decimal  = DD + SS/60.0;
 

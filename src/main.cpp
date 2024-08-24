@@ -3,7 +3,6 @@
 #include <array>
 #include <fstream>
 #include <sstream>
-#include <mutex>
 #include <chrono>
 #include <semaphore>
 
@@ -32,7 +31,6 @@ void spawn2()
     coord::DMS DMS_1(coord::LLA_To_DMS(*LLA_2, coord::LLA_Type::LATITUDE));
 }
 
-std::shared_ptr<std::mutex> Mute_Satellite;
 std::shared_ptr<std::binary_semaphore> Semaphore_Satellite;
 
 std::vector<nmea::Satellite_Data_Type> Satellite_Table;
@@ -44,10 +42,6 @@ void Produce_Data()
 
     string Current_Line;
 
-    array<string, 30> Read_Buffer;
-
-    const int Buffer_Size = 30;
-
     int count = 0;
 
     unique_ptr<nmea::nmea_parse> Parser;
@@ -57,18 +51,11 @@ void Produce_Data()
 
     while(getline(GPS_Stream, Current_Line))
     {
-        Read_Buffer.at(count) = Current_Line;
-
-        Parser->Parse(Read_Buffer.at(count));
-
-        if(count == Buffer_Size-1)
-        {
-            count = 0;
-        }
-        else
-        {
-            count++;
-        }
+        auto start = std::chrono::high_resolution_clock::now();
+        Parser->Parse(Current_Line);
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<chrono::microseconds>(stop - start);
+        std::cout << "Time elapsed: " << duration.count() << std::endl;
     }
 
 }
@@ -83,31 +70,21 @@ void Consume_Data()
             if((Satellite_Table.size() == Satellite_Table.capacity()) && (Satellite_Table.capacity() > 0))
             {
                 auto start = std::chrono::high_resolution_clock::now();
-                //for(const nmea::Satellite_Data_Type Sat : Satellite_Table)
-                //{
-                //    std::cout << "ID: " << Sat.ID << " Azimuth: " << Sat.Azimuth << " Elevation: " << Sat.Elevation << " SNR: " << Sat.SNR << std::endl;
-                //}
                 Local_Sat_Data = Satellite_Table;
                 Satellite_Table.clear();
                 Satellite_Table.shrink_to_fit();
                 auto stop = std::chrono::high_resolution_clock::now();
                 auto duration = std::chrono::duration_cast<chrono::microseconds>(stop - start);
-                std::cout << "Time elapsed: " << duration.count() << std::endl;
-            }
-            else
-            {
-                //std::cout << "Size: " << Satellite_Table.size() << " Capacity: " << Satellite_Table.capacity() << std::endl;
+                //std::cout << "Time elapsed: " << duration.count() << std::endl;
             }
         }
         Semaphore_Satellite->release();
-        //usleep(20);
     }
 }
 
 int main(void)
 {
 
-    Mute_Satellite = make_shared<std::mutex>();
     Semaphore_Satellite = make_shared<std::binary_semaphore>(1);
     Satellite_Table.clear();
 

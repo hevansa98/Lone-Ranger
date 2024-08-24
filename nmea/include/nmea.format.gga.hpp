@@ -72,6 +72,11 @@ namespace nmea
 
     void nmea_format_gga::Process_Fields()
     {
+        if (std::stod(Currently_Processed_Message_Dbg[(size_t)FIELDS::GPS_QUALITY_INDICATOR]) == 0)
+        {
+            std::cout << "Bad fix" << std::endl;
+            return;
+        }
         for(size_t Field = (size_t)FIELDS::MESSAGE_ID; Field < (size_t)FIELDS::NUM_OF_FIELDS; Field++)
         {
             switch ((FIELDS)Field)
@@ -85,6 +90,7 @@ namespace nmea
 
                 case FIELDS::LATITUDE:
 
+                    std::cout << Currently_Processed_Message_Dbg[(size_t)FIELDS::LATITUDE] << std::endl;
                     Convert_RAW_LLA_To_Decimal( std::stod(Currently_Processed_Message_Dbg[(size_t)FIELDS::LATITUDE]), 
                                                 Current_Fields.Latitude );
                     break;
@@ -99,6 +105,7 @@ namespace nmea
 
                 case FIELDS::LONGITUDE:
 
+                    std::cout << Currently_Processed_Message_Dbg[(size_t)FIELDS::LATITUDE] << std::endl;
                     Convert_RAW_LLA_To_Decimal( std::stod(Currently_Processed_Message_Dbg[(size_t)FIELDS::LONGITUDE]), 
                                                 Current_Fields.Longitude );
                     break;

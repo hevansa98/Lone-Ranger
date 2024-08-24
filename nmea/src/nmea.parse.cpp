@@ -15,10 +15,10 @@ namespace nmea
 
     void nmea_parse::Parse(const std::string & RAW)
     {
-        if(RAW.empty() == false)
+        if(RAW.length() > 6)
         {
             std::string Prefix = RAW.substr(3, 3);
-            //std::cout << Prefix << std::endl;
+            std::cout << Prefix << std::endl;
             
             if(RAW[0] == '$')
             {
